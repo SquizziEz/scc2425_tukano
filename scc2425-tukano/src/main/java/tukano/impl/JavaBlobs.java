@@ -41,7 +41,7 @@ public class JavaBlobs implements Blobs {
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
 
-		return storage.write( toPath( blobId ), bytes);
+		return storage.write(blobId, bytes);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class JavaBlobs implements Blobs {
 		if( ! validBlobId( blobId, token ) )
 			return error(FORBIDDEN);
 
-		return storage.read( toPath( blobId ) );
+		return storage.read( blobId );
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class JavaBlobs implements Blobs {
 		if( ! validBlobId( blobId, token ) )
 			return error(FORBIDDEN);
 
-		return storage.read( toPath(blobId), sink);
+		return storage.read( blobId, sink);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class JavaBlobs implements Blobs {
 		if( ! validBlobId( blobId, token ) )
 			return error(FORBIDDEN);
 
-		return storage.delete( toPath(blobId));
+		return storage.delete( blobId);
 	}
 	
 	@Override
@@ -81,7 +81,7 @@ public class JavaBlobs implements Blobs {
 		if( ! Token.isValid( token, userId ) )
 			return error(FORBIDDEN);
 		
-		return storage.delete( toPath(userId));
+		return storage.delete( userId);
 	}
 	
 	private boolean validBlobId(String blobId, String token) {		

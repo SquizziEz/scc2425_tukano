@@ -46,9 +46,9 @@ public class CloudSystemStorage implements BlobStorage {
 	}
 	
 	@Override
-	public Result<Void> write(/**String path,*/ byte[] bytes) {
-		/**if (path == null)
-			return error(BAD_REQUEST);*/
+	public Result<Void> write(String id, byte[] bytes) {
+		if (id == null)
+			return error(BAD_REQUEST);
 
 		var key = Hash.of(bytes);
 		BinaryData data = BinaryData.fromBytes(bytes);
@@ -66,15 +66,17 @@ public class CloudSystemStorage implements BlobStorage {
 	}
 
 	@Override
-	public Result<byte[]> read(String path) {
-		if (path == null)
+	public Result<byte[]> read(String id) {
+		if (id == null)
 			return error(BAD_REQUEST);
 		
-		var file = toFile( path );
+		/**var file = toFile( path );
 		if( ! file.exists() )
-			return error(NOT_FOUND);
-		
-		var bytes = IO.read(file);
+			return error(NOT_FOUND);*/
+		var key = Hash.of(id);
+		BlobClient blob = containerClient.getBlobClient( key);
+		BinaryData data = blob.downloadContent();
+		byte[] bytes = data.toBytes();
 		return bytes != null ? ok( bytes ) : error( INTERNAL_ERROR );
 	}
 
