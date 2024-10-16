@@ -81,24 +81,32 @@ public class CloudSystemStorage implements BlobStorage {
 	}
 
 	@Override
-	public Result<Void> read(String path, Consumer<byte[]> sink) {
-		if (path == null)
+	public Result<Void> read(String id, Consumer<byte[]> sink) {
+		if (id == null)
 			return error(BAD_REQUEST);
 		
-		var file = toFile( path );
+		/**var file = toFile( path );
 		if( ! file.exists() )
-			return error(NOT_FOUND);
+			return error(NOT_FOUND);*/
 		
-		IO.read( file, CHUNK_SIZE, sink );
+		//IO.read( file, CHUNK_SIZE, sink );
+		var key = Hash.of(id);
+		BlobClient blob = containerClient.getBlobClient( key);
+		BinaryData data = blob.downloadContent();
+		byte[] bytes = data.toBytes();
+		if( bytes == null )
+			return error( INTERNAL_ERROR );
+		
+		sink.accept( bytes );
 		return ok();
 	}
 	
 	@Override
-	public Result<Void> delete(String path) {
-		if (path == null)
+	public Result<Void> delete(String id) {
+		if (id == null)
 			return error(BAD_REQUEST);
 
-		try {
+		/**try {
 			var file = toFile( path );
 			Files.walk(file.toPath())
 			.sorted(Comparator.reverseOrder())
@@ -107,7 +115,10 @@ public class CloudSystemStorage implements BlobStorage {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return error(INTERNAL_ERROR);
-		}
+		}*/
+		var key = Hash.of(id);
+		BlobClient blob = containerClient.getBlobClient( key);
+		blob.delete();
 		return ok();
 	}
 	
@@ -120,6 +131,4 @@ public class CloudSystemStorage implements BlobStorage {
 		
 		return res;
 	}
-
-	
 }
